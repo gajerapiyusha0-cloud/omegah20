@@ -161,6 +161,9 @@ def test_remaining_platform_modules(client: TestClient):
     hist = client.get("/api/v1/processing/histogram")
     assert hist.status_code == 200
     assert len(hist.json()["counts"]) >= 4
+    job = client.post("/api/v1/processing/jobs/ndvi", json={"scene": "harbor"})
+    assert job.status_code == 200
+    assert job.json()["broker"] in {"redis", "inline"}
     assets = client.get("/api/v1/assets")
     assert len(assets.json()) >= 6
     note = client.post("/api/v1/journal", json={"title": "Harbor", "body": "surge watch"})

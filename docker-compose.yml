@@ -47,6 +47,17 @@ services:
     ports:
       - "3000:3000"
 
+  worker:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker --loglevel=INFO --concurrency=2
+    environment:
+      DATABASE_URL: postgresql+psycopg2://geotwin:geotwin@postgres:5432/geotwinverse
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+      - postgres
+    profiles: ["worker"]
+
   nginx:
     image: nginx:1.27-alpine
     volumes:

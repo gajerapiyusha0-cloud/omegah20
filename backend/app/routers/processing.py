@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import GisFeature
-from app.services.gis import synthetic_ndvi
+from app.services.gis import synthetic_histogram, synthetic_ndvi
+from app.worker import celery_app, enqueue_ndvi
 
 router = APIRouter(prefix="/processing", tags=["processing"])
 
@@ -12,6 +13,10 @@ router = APIRouter(prefix="/processing", tags=["processing"])
 class ZonalRequest(BaseModel):
     scene: str = "canopy-reserve"
     threshold: float = 0.4
+
+
+class NdviJobRequest(BaseModel):
+    scene: str = "canopy-reserve"
 
 
 @router.post("/zonal")
@@ -32,15 +37,23 @@ def zonal(payload: ZonalRequest) -> dict:
 
 @router.get("/histogram")
 def histogram(scene: str = "canopy-reserve", bins: int = 8) -> dict:
-    grid = synthetic_ndvi(seed=abs(hash(scene)) % 10_000)
-    cells = [v for row in grid["grid"] for v in row]
-    lo, hi = min(cells), max(cells)
-    width = (hi - lo) / max(bins, 1) or 1
-    counts = [0] * bins
-    for value in cells:
-        idx = min(bins - 1, int((value - lo) / width))
-        counts[idx] += 1
-    return {"scene": scene, "bins": bins, "counts": counts, "min": lo, "max": hi}
+    return synthetic_histogram(scene=scene, bins=bins)
+
+
+@router.post("/jobs/ndvi")
+def ndvi_job(payload: NdviJobRequest) -> dict:
+    return enqueue_ndvi(payload.scene)
+
+
+@router.get("/jobs/{task_id}")
+def job_status(task_id: str) -> dict:
+    result = celery_app.AsyncResult(task_id)
+    payload = {"task_id": task_id, "state": result.state, "ready": result.ready()}
+    if result.successful():
+        payload["result"] = result.result
+    elif result.failed():
+        payload["error"] = str(result.result)
+    return payload
 
 
 @router.get("/export/geojson")

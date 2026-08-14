@@ -118,6 +118,11 @@ export const api = {
   addNote: (title: string, body: string, domain_slug?: string) =>
     request("/journal", { method: "POST", body: JSON.stringify({ title, body, domain_slug }) }),
   histogram: (scene: string) => request<{ counts: number[]; min: number; max: number }>(`/processing/histogram?scene=${scene}`),
+  ndviJob: (scene: string) =>
+    request<{ queued: boolean; task_id: string | null; broker: string }>(`/processing/jobs/ndvi`, {
+      method: "POST",
+      body: JSON.stringify({ scene }),
+    }),
   codegen: (message: string) => request<{ files: Record<string, string> }>("/ai/codegen", { method: "POST", body: JSON.stringify({ message }) }),
   path: (slug: string) => request<{ steps: { id: string; title: string; est_min: number }[]; adaptive_rule: string }>(`/ai/path?slug=${slug}`),
   cypher: () => request<{ statements: string[] }>("/graph/export/cypher"),

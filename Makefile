@@ -1,4 +1,4 @@
-.PHONY: install backend-test frontend-test test dev-backend dev-frontend dev
+.PHONY: install backend-test frontend-test test dev-backend dev-frontend dev remaining
 
 install:
 	python3 -m pip install -r backend/requirements.txt
@@ -21,3 +21,6 @@ dev-frontend:
 
 dev:
 	bash scripts/dev.sh
+
+remaining:
+	bash scripts/start-remaining.sh

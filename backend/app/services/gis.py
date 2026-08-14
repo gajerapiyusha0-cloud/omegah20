@@ -69,3 +69,15 @@ def synthetic_ndvi(seed: int = 7, size: int = 16) -> dict:
         "source": "synthetic-sentinel-2-proxy",
         "disclaimer": "Replace with Copernicus STAC when credentials are configured.",
     }
+
+
+def synthetic_histogram(scene: str = "canopy-reserve", bins: int = 8) -> dict:
+    grid = synthetic_ndvi(seed=abs(hash(scene)) % 10_000)
+    cells = [v for row in grid["grid"] for v in row]
+    lo, hi = min(cells), max(cells)
+    width = (hi - lo) / max(bins, 1) or 1
+    counts = [0] * bins
+    for value in cells:
+        idx = min(bins - 1, int((value - lo) / width))
+        counts[idx] += 1
+    return {"scene": scene, "bins": bins, "counts": counts, "min": lo, "max": hi}
