@@ -10,6 +10,7 @@ import { api } from "@/lib/api";
 export function Constellation() {
   const domains = useExperience((s) => s.domains);
   const query = useExperience((s) => s.query);
+  const category = useExperience((s) => s.category);
   const selected = useExperience((s) => s.selectedDomain);
   const selectDomain = useExperience((s) => s.selectDomain);
   const hapticEnabled = useExperience((s) => s.hapticEnabled);
@@ -18,11 +19,12 @@ export function Constellation() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return domains;
-    return domains.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q) || d.slug.includes(q),
-    );
-  }, [domains, query]);
+    return domains.filter((d) => {
+      const catOk = category === "all" || d.category === category;
+      const qOk = !q || d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q) || d.slug.includes(q);
+      return catOk && qOk;
+    });
+  }, [domains, query, category]);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const color = useMemo(() => new THREE.Color(), []);
@@ -52,6 +54,7 @@ export function Constellation() {
   return (
     <instancedMesh
       ref={mesh}
+      key={filtered.length}
       args={[undefined, undefined, Math.max(filtered.length, 1)]}
       onClick={async (event) => {
         event.stopPropagation();

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import SessionLocal, init_db
-from app.routers import ai, auth, domains, gis, graph, haptics, health, satellite, simulations, twins, ws
+from app.routers import ai, auth, bootstrap, domains, gis, graph, haptics, health, satellite, simulations, twins, ws
 from app.seed import seed_if_empty
 
 settings = get_settings()
@@ -33,14 +33,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.origins,
-    allow_credentials=True,
+    allow_origins=["*"] if settings.debug else settings.origins,
+    allow_credentials=not settings.debug,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 prefix = settings.api_prefix
 app.include_router(health.router, prefix=prefix)
+app.include_router(bootstrap.router, prefix=prefix)
 app.include_router(auth.router, prefix=prefix)
 app.include_router(domains.router, prefix=prefix)
 app.include_router(graph.router, prefix=prefix)

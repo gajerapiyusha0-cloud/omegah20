@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { Domain, Twin } from "./api";
 
-export type Mode = "universe" | "gis" | "graph" | "twin" | "sim" | "learn";
+export type Mode = "universe" | "gis" | "graph" | "twin" | "sim" | "learn" | "satellite" | "haptics";
 
 type ExperienceState = {
   mode: Mode;
@@ -10,24 +10,27 @@ type ExperienceState = {
   reducedMotion: boolean;
   locale: string;
   query: string;
+  category: string;
   domains: Domain[];
   twins: Twin[];
   selectedDomain?: Domain;
   selectedTwin?: Twin;
-  radialOpen: boolean;
   assistantOpen: boolean;
   lastHaptic: string;
+  booted: boolean;
+  apiOnline: boolean;
   setMode: (mode: Mode) => void;
   setTheme: (theme: "dark" | "light") => void;
   setHapticEnabled: (value: boolean) => void;
   setQuery: (query: string) => void;
+  setCategory: (category: string) => void;
   setDomains: (domains: Domain[]) => void;
   setTwins: (twins: Twin[]) => void;
   selectDomain: (domain?: Domain) => void;
   selectTwin: (twin?: Twin) => void;
-  toggleRadial: () => void;
   toggleAssistant: () => void;
   setLastHaptic: (id: string) => void;
+  setBooted: (booted: boolean, apiOnline: boolean) => void;
 };
 
 export const useExperience = create<ExperienceState>((set) => ({
@@ -37,11 +40,13 @@ export const useExperience = create<ExperienceState>((set) => ({
   reducedMotion: false,
   locale: "en",
   query: "",
+  category: "all",
   domains: [],
   twins: [],
-  radialOpen: false,
   assistantOpen: true,
   lastHaptic: "",
+  booted: false,
+  apiOnline: false,
   setMode: (mode) => set({ mode }),
   setTheme: (theme) => {
     if (typeof document !== "undefined") {
@@ -51,11 +56,12 @@ export const useExperience = create<ExperienceState>((set) => ({
   },
   setHapticEnabled: (hapticEnabled) => set({ hapticEnabled }),
   setQuery: (query) => set({ query }),
+  setCategory: (category) => set({ category }),
   setDomains: (domains) => set({ domains }),
   setTwins: (twins) => set({ twins }),
   selectDomain: (selectedDomain) => set({ selectedDomain, mode: selectedDomain ? "learn" : "universe" }),
   selectTwin: (selectedTwin) => set({ selectedTwin, mode: selectedTwin ? "twin" : "universe" }),
-  toggleRadial: () => set((s) => ({ radialOpen: !s.radialOpen })),
   toggleAssistant: () => set((s) => ({ assistantOpen: !s.assistantOpen })),
   setLastHaptic: (lastHaptic) => set({ lastHaptic }),
+  setBooted: (booted, apiOnline) => set({ booted, apiOnline }),
 }));

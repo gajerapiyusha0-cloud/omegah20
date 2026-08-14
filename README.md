@@ -17,29 +17,14 @@ This repository is a working **Phase 1** implementation of the GeoTwinVerse Omeg
 - **Haptics** — 50 named patterns with Vibration API / gamepad rumble / no-op fallback. The product is fully usable without hardware.
 - **Platform** — FastAPI, SQLite or PostGIS, Redis/Celery worker stub, Docker Compose, Nginx edge profile, GitHub Actions.
 
-## Quick start (local)
-
-Backend (SQLite, no Docker):
+## Quick start
 
 ```bash
-cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-PYTHONPATH=. uvicorn app.main:app --reload --port 8000
+make install
+make dev
 ```
 
-API docs: http://localhost:8000/docs
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-cp .env.local.example .env.local
-npm run dev
-```
-
-Open http://localhost:3000
+Then open http://localhost:3000 — API docs at http://localhost:8000/docs.
 
 ## Docker
 

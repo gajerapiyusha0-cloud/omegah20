@@ -13,13 +13,21 @@ export function AssistantDock() {
   const [message, setMessage] = useState("");
   const [reply, setReply] = useState("Ask me to navigate domains, run simulations, or explain a twin.");
   const [path, setPath] = useState<string[]>([]);
+  const [related, setRelated] = useState<{ slug: string; name: string }[]>([]);
+  const domains = useExperience((s) => s.domains);
+  const selectDomain = useExperience((s) => s.selectDomain);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (!message.trim()) return;
-    const res = await api.assist(message, locale);
+    const res = await api.assist(message, locale).catch(() => ({
+      reply: "API offline. Use the encyclopedia drawer or constellation while the backend starts.",
+      learning_path: ["Open a domain sphere", "Inspect lessons", "Run a simulation"],
+      related_domains: [] as { slug: string; name: string }[],
+    }));
     setReply(res.reply);
     setPath(res.learning_path);
+    setRelated(res.related_domains || []);
     setMessage("");
     if (hapticEnabled) playHaptic({ intensity: 0.28, duration_ms: 70 });
   }
@@ -61,6 +69,22 @@ export function AssistantDock() {
             <li key={step}>{step}</li>
           ))}
         </ol>
+      )}
+      {related.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-1">
+          {related.map((item) => (
+            <button
+              key={item.slug}
+              className="rounded-full border border-white/10 px-2 py-0.5 text-[11px]"
+              onClick={() => {
+                const next = domains.find((d) => d.slug === item.slug);
+                if (next) selectDomain(next);
+              }}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
       )}
       <form onSubmit={onSubmit} className="flex gap-2">
         <input

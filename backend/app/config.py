@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Virtual GeoTwinVerse"
     app_version: str = "0.1.0"
-    debug: bool = False
+    debug: bool = True
     api_prefix: str = "/api/v1"
 
     secret_key: str = "geotwinverse-dev-secret-change-in-production"

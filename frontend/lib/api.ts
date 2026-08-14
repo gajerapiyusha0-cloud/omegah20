@@ -71,4 +71,11 @@ export const api = {
     ),
   haptics: () => request<{ id: string; name: string; category: string; intensity: number; duration_ms: number }[]>("/haptics/patterns"),
   playHaptic: (pattern_id: string) => request("/haptics/play", { method: "POST", body: JSON.stringify({ pattern_id }) }),
+  bootstrap: () =>
+    request<{
+      domains: Domain[];
+      twins: Twin[];
+      haptics: { id: string; name: string; category: string; intensity: number; duration_ms: number }[];
+      engines: { id: string; name: string; haptic: string }[];
+    }>("/bootstrap"),
 };

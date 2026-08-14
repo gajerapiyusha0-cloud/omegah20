@@ -94,6 +94,15 @@ def test_ai_assistant(client: TestClient):
     assert "reply" in body
 
 
+def test_bootstrap_payload(client: TestClient):
+    res = client.get("/api/v1/bootstrap")
+    assert res.status_code == 200
+    body = res.json()
+    assert len(body["domains"]) >= 300
+    assert len(body["twins"]) >= 8
+    assert len(body["haptics"]) == 50
+
+
 def test_auth_register_login(client: TestClient):
     email = "tester@geotwinverse.local"
     client.post(
