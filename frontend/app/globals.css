@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #04060f;
+  --panel: rgba(8, 14, 32, 0.72);
+  --stroke: rgba(103, 232, 249, 0.28);
+  --text: #ecfeff;
+  --muted: #94a3b8;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #e8f4ff;
+  --panel: rgba(255, 255, 255, 0.78);
+  --stroke: rgba(14, 116, 144, 0.28);
+  --text: #0b1324;
+  --muted: #475569;
+}
+
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.holo-panel {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.scanlines::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.015) 3px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #67e8f9;
+  outline-offset: 3px;
+}

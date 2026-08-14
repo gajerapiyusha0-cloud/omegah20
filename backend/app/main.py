@@ -1,0 +1,48 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.config import get_settings
+from app.database import init_db, SessionLocal
+from app.routers import ai, auth, domains, gis, graph, haptics, health, satellite, simulations, twins, ws
+from app.seed import seed_if_empty
+
+settings = get_settings()
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    description="Immersive geospatial knowledge universe API",
+    openapi_url=f"{settings.api_prefix}/openapi.json",
+    docs_url="/docs",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+prefix = settings.api_prefix
+app.include_router(health.router, prefix=prefix)
+app.include_router(auth.router, prefix=prefix)
+app.include_router(domains.router, prefix=prefix)
+app.include_router(graph.router, prefix=prefix)
+app.include_router(gis.router, prefix=prefix)
+app.include_router(twins.router, prefix=prefix)
+app.include_router(simulations.router, prefix=prefix)
+app.include_router(satellite.router, prefix=prefix)
+app.include_router(ai.router, prefix=prefix)
+app.include_router(haptics.router, prefix=prefix)
+app.include_router(ws.router, prefix=prefix)
+
+
+@app.on_event("startup")
+def on_startup() -> None:
+    init_db()
+    db = SessionLocal()
+    try:
+        seed_if_empty(db)
+    finally:
+        db.close()
