@@ -110,4 +110,14 @@ export const api = {
   },
   landcover: (scene: string) => request<{ counts: Record<string, number>; classification: string }>(`/satellite/landcover?scene=${scene}`),
   disaster: (hazard = "flood") => request<{ advisory: string; recommended_twins: string[]; haptic: string }>(`/satellite/disaster?hazard=${hazard}`),
+  stacSearch: () => request<{ features: { id: string; properties: Record<string, unknown> }[] }>("/stac/search"),
+  assets: () => request<{ id: string; kind: string; name: string; format: string }[]>("/assets"),
+  journal: () => request<{ id: number; title: string; body: string; domain_slug?: string }[]>("/journal"),
+  addNote: (title: string, body: string, domain_slug?: string) =>
+    request("/journal", { method: "POST", body: JSON.stringify({ title, body, domain_slug }) }),
+  histogram: (scene: string) => request<{ counts: number[]; min: number; max: number }>(`/processing/histogram?scene=${scene}`),
+  codegen: (message: string) => request<{ files: Record<string, string> }>("/ai/codegen", { method: "POST", body: JSON.stringify({ message }) }),
+  path: (slug: string) => request<{ steps: { id: string; title: string; est_min: number }[]; adaptive_rule: string }>(`/ai/path?slug=${slug}`),
+  cypher: () => request<{ statements: string[] }>("/graph/export/cypher"),
+  locales: () => request<{ code: string; name: string }[]>("/ai/locales"),
 };

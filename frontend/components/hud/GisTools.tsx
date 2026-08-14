@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 export function GisTools() {
@@ -9,6 +9,12 @@ export function GisTools() {
   const [toLon, setToLon] = useState("-1.26");
   const [toLat, setToLat] = useState("51.75");
   const [result, setResult] = useState("");
+  const [heat, setHeat] = useState<{ name: string; weight: number }[]>([]);
+  const [stac, setStac] = useState("");
+
+  useEffect(() => {
+    api.heatmap().then((res) => setHeat(res.points.map((p) => ({ name: p.name, weight: p.weight })))).catch(() => setHeat([]));
+  }, []);
 
   async function measure(event: FormEvent) {
     event.preventDefault();
@@ -32,6 +38,26 @@ export function GisTools() {
         <button className="col-span-2 rounded-xl bg-cyan-400/20 py-2 text-holos">Measure great-circle</button>
       </form>
       {result && <p className="mt-2 text-sm text-holos">{result}</p>}
+      <p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-slate-500">Heat map</p>
+      <ul className="mt-2 space-y-1">
+        {heat.map((point) => (
+          <li key={point.name} className="flex items-center gap-2 text-[11px]">
+            <span className="w-28 truncate">{point.name}</span>
+            <span className="h-1 flex-1 overflow-hidden rounded bg-white/10">
+              <span className="block h-full bg-amber-300" style={{ width: `${Math.round(point.weight * 100)}%` }} />
+            </span>
+          </li>
+        ))}
+      </ul>
+      <button
+        className="mt-3 rounded-full border border-white/10 px-3 py-1 text-[11px]"
+        onClick={async () => {
+          const res = await api.stacSearch().catch(() => ({ features: [] }));
+          setStac(res.features[0]?.id || "no scene");
+        }}
+      >
+        STAC search {stac && `· ${stac}`}
+      </button>
     </section>
   );
 }

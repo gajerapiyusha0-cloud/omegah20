@@ -9,6 +9,11 @@
   --stroke: rgba(103, 232, 249, 0.28);
   --text: #ecfeff;
   --muted: #94a3b8;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --radius: 24px;
+  --motion-fast: 160ms;
 }
 
 :root[data-theme="light"] {

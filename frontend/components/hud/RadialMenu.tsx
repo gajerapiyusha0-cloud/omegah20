@@ -15,6 +15,9 @@ const ITEMS: { mode: Mode; label: string }[] = [
   { mode: "plugins", label: "Plugins" },
   { mode: "collab", label: "Collab" },
   { mode: "admin", label: "Admin" },
+  { mode: "journal", label: "Journal" },
+  { mode: "assets", label: "Assets" },
+  { mode: "settings", label: "Settings" },
   { mode: "learn", label: "Learn" },
 ];
 

@@ -13,7 +13,7 @@ Set production secrets:
 
 ## Kubernetes
 
-Manifests are intentionally deferred to Phase 4. The images (`backend/Dockerfile`, `frontend/Dockerfile`) are the units to schedule behind Nginx or an ingress that mirrors `nginx/nginx.conf`.
+Kubernetes starter manifests live in `k8s/platform.yaml`. Prometheus can scrape `/metrics`.
 
 ## CI
 

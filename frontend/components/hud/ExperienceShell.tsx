@@ -25,6 +25,12 @@ import { AuthPanel } from "./AuthPanel";
 import { TimelinePanel } from "./TimelinePanel";
 import { GisTools } from "./GisTools";
 import { NotificationBell } from "./NotificationBell";
+import { CommandPalette } from "./CommandPalette";
+import { SettingsPanel } from "./SettingsPanel";
+import { HelpOverlay } from "./HelpOverlay";
+import { JournalPanel } from "./JournalPanel";
+import { AssetLibrary } from "./AssetLibrary";
+import { useGamepadNav } from "@/lib/gamepad";
 
 const UniverseCanvas = dynamic(() => import("../universe/UniverseCanvas").then((m) => m.UniverseCanvas), { ssr: false });
 const CesiumViewer = dynamic(() => import("../gis/CesiumViewer").then((m) => m.CesiumViewer), { ssr: false });
@@ -35,6 +41,8 @@ export function ExperienceShell() {
   const setDomains = useExperience((s) => s.setDomains);
   const setTwins = useExperience((s) => s.setTwins);
   const setBooted = useExperience((s) => s.setBooted);
+  const setCommandOpen = useExperience((s) => s.setCommandOpen);
+  useGamepadNav();
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +67,11 @@ export function ExperienceShell() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(true);
+        return;
+      }
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
       if (event.key === "Escape") useExperience.getState().selectDomain(undefined);
@@ -73,7 +86,7 @@ export function ExperienceShell() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [setCommandOpen]);
 
   return (
     <main id="main" className="relative h-screen w-screen">
@@ -101,7 +114,12 @@ export function ExperienceShell() {
         </>
       )}
       {mode === "timeline" && <TimelinePanel />}
+      {mode === "journal" && <JournalPanel />}
+      {mode === "assets" && <AssetLibrary />}
+      {mode === "settings" && <SettingsPanel />}
       {mode === "gis" && <GisTools />}
+      <HelpOverlay />
+      <CommandPalette />
       {!booted && <BootSplash />}
     </main>
   );

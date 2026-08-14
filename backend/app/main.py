@@ -9,6 +9,7 @@ from app.routers import (
     admin,
     ai,
     analytics,
+    assets,
     auth,
     bootstrap,
     collab,
@@ -18,10 +19,14 @@ from app.routers import (
     graph,
     haptics,
     health,
+    journal,
     notifications,
+    observability,
     plugins,
+    processing,
     satellite,
     simulations,
+    stac,
     timeline,
     twins,
     ws,
@@ -78,4 +83,9 @@ app.include_router(admin.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
 app.include_router(timeline.router, prefix=prefix)
 app.include_router(collab.router, prefix=prefix)
+app.include_router(processing.router, prefix=prefix)
+app.include_router(stac.router, prefix=prefix)
+app.include_router(assets.router, prefix=prefix)
+app.include_router(journal.router, prefix=prefix)
 app.include_router(ws.router, prefix=prefix)
+app.include_router(observability.router)

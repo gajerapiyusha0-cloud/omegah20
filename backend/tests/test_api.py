@@ -154,3 +154,23 @@ def test_gis_buffer_and_landcover(client: TestClient):
     graph = client.get("/api/v1/graph/domain/gis")
     assert graph.status_code == 200
     assert len(graph.json()["nodes"]) >= 1
+
+
+def test_remaining_platform_modules(client: TestClient):
+    assert client.get("/api/v1/stac/search").status_code == 200
+    hist = client.get("/api/v1/processing/histogram")
+    assert hist.status_code == 200
+    assert len(hist.json()["counts"]) >= 4
+    assets = client.get("/api/v1/assets")
+    assert len(assets.json()) >= 6
+    note = client.post("/api/v1/journal", json={"title": "Harbor", "body": "surge watch"})
+    assert note.status_code == 200
+    code = client.post("/api/v1/ai/codegen", json={"message": "GIS"})
+    assert "client.py" in code.json()["files"]
+    path = client.get("/api/v1/ai/path", params={"slug": "gis"})
+    assert len(path.json()["steps"]) >= 4
+    cypher = client.get("/api/v1/graph/export/cypher")
+    assert cypher.json()["dialect"] == "cypher"
+    metrics = client.get("/metrics")
+    assert metrics.status_code == 200
+    assert "geotwin_up" in metrics.text

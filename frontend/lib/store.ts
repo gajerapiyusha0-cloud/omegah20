@@ -14,7 +14,10 @@ export type Mode =
   | "plugins"
   | "collab"
   | "admin"
-  | "timeline";
+  | "timeline"
+  | "journal"
+  | "assets"
+  | "settings";
 
 type ExperienceState = {
   mode: Mode;
@@ -44,6 +47,10 @@ type ExperienceState = {
   toggleAssistant: () => void;
   setLastHaptic: (id: string) => void;
   setBooted: (booted: boolean, apiOnline: boolean) => void;
+  setLocale: (locale: string) => void;
+  setReducedMotion: (value: boolean) => void;
+  commandOpen: boolean;
+  setCommandOpen: (value: boolean) => void;
 };
 
 export const useExperience = create<ExperienceState>((set) => ({
@@ -60,6 +67,7 @@ export const useExperience = create<ExperienceState>((set) => ({
   lastHaptic: "",
   booted: false,
   apiOnline: false,
+  commandOpen: false,
   setMode: (mode) => set({ mode }),
   setTheme: (theme) => {
     if (typeof document !== "undefined") {
@@ -77,4 +85,7 @@ export const useExperience = create<ExperienceState>((set) => ({
   toggleAssistant: () => set((s) => ({ assistantOpen: !s.assistantOpen })),
   setLastHaptic: (lastHaptic) => set({ lastHaptic }),
   setBooted: (booted, apiOnline) => set({ booted, apiOnline }),
+  setLocale: (locale) => set({ locale }),
+  setReducedMotion: (reducedMotion) => set({ reducedMotion }),
+  setCommandOpen: (commandOpen) => set({ commandOpen }),
 }));

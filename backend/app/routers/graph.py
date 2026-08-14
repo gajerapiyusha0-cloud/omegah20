@@ -92,3 +92,14 @@ def constellation(db: Session = Depends(get_db), category: str | None = None) ->
             for d in domains
         ],
     }
+
+
+@router.get("/export/cypher")
+def export_cypher(db: Session = Depends(get_db), limit: int = 40) -> dict:
+    nodes = db.query(GraphNode).limit(limit).all()
+    ids = [n.id for n in nodes]
+    edges = db.query(GraphEdge).filter(GraphEdge.source_id.in_(ids)).limit(limit * 2).all() if ids else []
+    statements = [f"CREATE (n{n.id}:Concept {{title:{n.title!r}, slug:{n.slug!r}}})" for n in nodes]
+    for edge in edges:
+        statements.append(f"CREATE (n{edge.source_id})-[:{edge.relation.upper()}]->(n{edge.target_id})")
+    return {"dialect": "cypher", "statements": statements, "note": "Offline Neo4j dual-write payload."}

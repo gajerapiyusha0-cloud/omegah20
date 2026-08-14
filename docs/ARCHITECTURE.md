@@ -71,13 +71,7 @@ Patterns live in `backend/app/data/haptics.py` (50 ids). `POST /haptics/play` re
 
 ## Roadmap
 
-**Phase 1 (this repo)** — core platform, auth, GIS viewer, AI assistant, twins, simulations, haptics.
-
-**Phase 2** — Neo4j dual-write, collaborative workspaces, WebRTC, richer telemetry.
-
-**Phase 3** — live Copernicus STAC, plugin SDK, institutional content packs.
-
-**Phase 4** — Kubernetes, observability stack, enterprise SSO.
+**Phase 4+ connectors** (credentials / cluster, not missing app code): live Copernicus STAC, hosted Neo4j, OIDC SSO, OpenXR hardware. The APIs, plugin SDK, Cypher export, and STAC proxy are in this repository.
 
 ## Accessibility
 

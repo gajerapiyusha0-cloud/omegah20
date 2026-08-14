@@ -19,7 +19,10 @@ This repository implements the GeoTwinVerse Omega blueprint as a working researc
 - **Collaboration** — websocket rooms for shared presence.
 - **Plugins & admin** — marketplace catalog, analytics dashboard, administration console, spatial notifications.
 - **GIS editing** — GeoJSON create, buffer, measure, heatmap, land-cover and disaster-assessment proxies.
-- **Kubernetes** — starter manifests in `k8s/platform.yaml`.
+- **Journal, assets, settings** — field notes, asset library, locale / reduced-motion.
+- **Command palette** — Ctrl/⌘ K.
+- **Processing & STAC** — zonal/histogram proxies, GeoJSON export, STAC-shaped catalog.
+- **Observability** — Prometheus `/metrics`, plugin SDK, Cypher graph export, AI codegen + adaptive paths.
 
 ## Quick start
 
@@ -47,7 +50,7 @@ docker compose up --build
 | `/` | Focus spatial search |
 | `U` | Universe mode |
 | `G` | Cesium GIS mode |
-| `Esc` | Close domain space |
+| Ctrl/⌘ K | Command palette |
 
 ## Architecture
 
