@@ -9,7 +9,7 @@ This repository is a working **Phase 1** implementation of the GeoTwinVerse Omeg
 - **Experience layer** — Next.js cinematic HUD, holographic panels, radial modes, keyboard/voice input, dark/light themes, reduced-motion CSS.
 - **3D engine** — React Three Fiber universe with a procedural Earth, knowledge constellation (one sphere per domain), and twin markers.
 - **GIS layer** — CesiumJS globe (OSM basemap, no Ion token required) plus FastAPI GeoJSON, haversine measurement, CRS conversion, heat maps.
-- **Knowledge layer** — 320+ unique domains with lessons, categories, and a seeded graph (`has_lab`, `related_to`, `cross_disciplinary`).
+- **Knowledge layer** — 360 unique domains with lessons, categories, and a seeded graph (`has_lab`, `related_to`, `cross_disciplinary`).
 - **Digital twins** — City, campus, factory, forest, transport, energy, environment, laboratory, agriculture, and lunar outpost twins with state ticks and assumptions.
 - **Simulations** — Flood, climate, traffic, SIR epidemic, NDVI phenology, Keplerian orbit.
 - **Satellite proxy** — Synthetic Sentinel-2 NDVI/NDWI grids until Copernicus credentials are configured.

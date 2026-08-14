@@ -1,12 +1,26 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.database import init_db, SessionLocal
+from app.database import SessionLocal, init_db
 from app.routers import ai, auth, domains, gis, graph, haptics, health, satellite, simulations, twins, ws
 from app.seed import seed_if_empty
 
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    init_db()
+    db = SessionLocal()
+    try:
+        seed_if_empty(db)
+    finally:
+        db.close()
+    yield
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -14,6 +28,7 @@ app = FastAPI(
     description="Immersive geospatial knowledge universe API",
     openapi_url=f"{settings.api_prefix}/openapi.json",
     docs_url="/docs",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -36,13 +51,3 @@ app.include_router(satellite.router, prefix=prefix)
 app.include_router(ai.router, prefix=prefix)
 app.include_router(haptics.router, prefix=prefix)
 app.include_router(ws.router, prefix=prefix)
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
-    db = SessionLocal()
-    try:
-        seed_if_empty(db)
-    finally:
-        db.close()

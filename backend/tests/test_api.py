@@ -1,11 +1,16 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
 
-client = TestClient(app)
+
+@pytest.fixture
+def client():
+    with TestClient(app) as test_client:
+        yield test_client
 
 
-def test_health_and_domain_count():
+def test_health_and_domain_count(client: TestClient):
     res = client.get("/api/v1/health")
     assert res.status_code == 200
     body = res.json()
@@ -13,7 +18,7 @@ def test_health_and_domain_count():
     assert body["domains"] >= 300
 
 
-def test_domain_catalog_and_lookup():
+def test_domain_catalog_and_lookup(client: TestClient):
     res = client.get("/api/v1/domains")
     assert res.status_code == 200
     domains = res.json()
@@ -26,14 +31,14 @@ def test_domain_catalog_and_lookup():
     assert one.json()["name"] == "Artificial Intelligence"
 
 
-def test_semantic_search():
+def test_semantic_search(client: TestClient):
     res = client.get("/api/v1/graph/search", params={"q": "remote sensing climate"})
     assert res.status_code == 200
     results = res.json()["results"]
     assert len(results) >= 1
 
 
-def test_gis_measure_and_convert():
+def test_gis_measure_and_convert(client: TestClient):
     measure = client.post(
         "/api/v1/gis/measure",
         json={"from_lon": 0, "from_lat": 0, "to_lon": 0, "to_lat": 1},
@@ -48,7 +53,7 @@ def test_gis_measure_and_convert():
     assert abs(conv.json()["x"]) < 1e-6
 
 
-def test_simulation_orbit_and_flood():
+def test_simulation_orbit_and_flood(client: TestClient):
     orbit = client.post(
         "/api/v1/simulations/run",
         json={"engine": "orbit", "name": "ISS", "parameters": {"altitude_km": 400}},
@@ -63,7 +68,7 @@ def test_simulation_orbit_and_flood():
     assert flood.json()["result"]["peak_depth_m"] > 0
 
 
-def test_haptic_patterns_and_play():
+def test_haptic_patterns_and_play(client: TestClient):
     listing = client.get("/api/v1/haptics/patterns")
     assert listing.status_code == 200
     assert len(listing.json()) == 50
@@ -72,7 +77,7 @@ def test_haptic_patterns_and_play():
     assert play.json()["hardware_required"] is False
 
 
-def test_twins_and_satellite():
+def test_twins_and_satellite(client: TestClient):
     twins = client.get("/api/v1/twins")
     assert twins.status_code == 200
     assert len(twins.json()) >= 8
@@ -81,7 +86,7 @@ def test_twins_and_satellite():
     assert "ndvi_mean" in sat.json()
 
 
-def test_ai_assistant():
+def test_ai_assistant(client: TestClient):
     res = client.post("/api/v1/ai/assist", json={"message": "Explain GIS and teach me NDVI"})
     assert res.status_code == 200
     body = res.json()
@@ -89,7 +94,7 @@ def test_ai_assistant():
     assert "reply" in body
 
 
-def test_auth_register_login():
+def test_auth_register_login(client: TestClient):
     email = "tester@geotwinverse.local"
     client.post(
         "/api/v1/auth/register",
