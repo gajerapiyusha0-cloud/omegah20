@@ -74,6 +74,14 @@ export function TwinPanel() {
         >
           Advance state
         </button>
+        <button
+          className="rounded-full border border-white/10 px-3 py-1 text-xs"
+          onClick={async () => {
+            await api.ingestCityjsonSample().catch(() => undefined);
+          }}
+        >
+          Ingest CityJSON sample
+        </button>
       </div>
     </section>
   );

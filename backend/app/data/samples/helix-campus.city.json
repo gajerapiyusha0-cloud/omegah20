@@ -1,0 +1,25 @@
+{
+  "type": "CityJSON",
+  "version": "1.1",
+  "metadata": {
+    "title": "Helix Campus CityJSON",
+    "identifier": "helix-campus-cityjson",
+    "geographicalExtent": [-1.27, 51.74, 0, -1.24, 51.76, 24]
+  },
+  "vertices": [
+    [-1.2700, 51.7400, 0],
+    [-1.2400, 51.7400, 0],
+    [-1.2400, 51.7600, 0],
+    [-1.2700, 51.7600, 0]
+  ],
+  "CityObjects": {
+    "building-lab-a": {
+      "type": "Building",
+      "attributes": { "name": "Helix Lab A", "storeys": 4 }
+    },
+    "building-hall": {
+      "type": "Building",
+      "attributes": { "name": "Lecture Hall", "storeys": 2 }
+    }
+  }
+}

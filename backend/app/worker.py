@@ -9,6 +9,15 @@ from app.services.gis import synthetic_histogram, synthetic_ndvi
 
 settings = get_settings()
 celery_app = Celery("geotwinverse", broker=settings.redis_url, backend=settings.redis_url)
+celery_app.conf.broker_connection_retry_on_startup = True
+celery_app.conf.timezone = "UTC"
+celery_app.conf.beat_schedule = {
+    "refresh-canopy-ndvi": {
+        "task": "geotwinverse.compute_ndvi_proxy",
+        "schedule": 300.0,
+        "args": ("canopy-reserve",),
+    }
+}
 
 
 @celery_app.task(name="geotwinverse.compute_ndvi_proxy")

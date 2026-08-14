@@ -10,7 +10,7 @@ Remaining connectors (profiles):
 - `docker compose --profile sso up` — local campus OIDC issuer (`:8081`)
 - `docker compose --profile graph up` — Neo4j Bolt (`:7687`)
 
-Without Docker, `make remaining` starts Redis and prepares Neo4j. Run `scripts/start-oidc.sh` for SSO, then launch the API with:
+Without Docker, `make remaining` starts Redis, prepares Neo4j, and starts the local nginx edge on `:8080`. Run `scripts/start-oidc.sh` for SSO. Celery worker + beat + Flower should run beside the API.
 
 ```
 NEO4J_URI=bolt://127.0.0.1:7687 NEO4J_PASSWORD=geotwinverse \

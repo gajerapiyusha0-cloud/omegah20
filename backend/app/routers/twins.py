@@ -10,6 +10,20 @@ from app.schemas import TwinPublic
 router = APIRouter(prefix="/twins", tags=["twins"])
 
 
+@router.post("/ingest/cityjson")
+def ingest_cityjson_body(payload: dict, db: Session = Depends(get_db)) -> dict:
+    from app.services.cityjson import ingest_cityjson
+
+    return ingest_cityjson(db, payload)
+
+
+@router.post("/ingest/cityjson/sample")
+def ingest_cityjson_sample(db: Session = Depends(get_db)) -> dict:
+    from app.services.cityjson import ingest_cityjson, load_sample
+
+    return ingest_cityjson(db, load_sample())
+
+
 @router.get("", response_model=list[TwinPublic])
 def list_twins(twin_type: str | None = None, db: Session = Depends(get_db)) -> list[DigitalTwin]:
     query = db.query(DigitalTwin)

@@ -8,10 +8,11 @@ router = APIRouter(prefix="/satellite", tags=["satellite"])
 @router.get("/status")
 def status() -> dict:
     return {
-        "provider": "Copernicus Sentinel (proxy)",
-        "live": False,
+        "provider": "Element84 Earth Search + Copernicus Sentinel-2",
+        "live": True,
         "products": ["S2-L2A", "NDVI", "NDWI", "land-cover"],
-        "note": "Live STAC access activates when COPERNICUS credentials are set.",
+        "stac": "/api/v1/stac/search",
+        "note": "Live STAC search is on. CDS credentials remain optional for archive download.",
     }
 
 

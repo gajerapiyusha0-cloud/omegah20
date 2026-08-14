@@ -187,3 +187,11 @@ def test_remaining_platform_modules(client: TestClient):
     assert synced.json()["backend"] in {"memory", "neo4j"}
     stac = client.get("/api/v1/stac/search")
     assert "features" in stac.json()
+    remaining = client.get("/api/v1/platform/remaining")
+    assert remaining.status_code == 200
+    assert "connectors" in remaining.json()
+    city = client.post("/api/v1/twins/ingest/cityjson/sample")
+    assert city.status_code == 200
+    assert city.json()["objects"] >= 1
+    sat = client.get("/api/v1/satellite/status")
+    assert sat.json()["live"] is True

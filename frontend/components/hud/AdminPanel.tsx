@@ -5,9 +5,11 @@ import { api } from "@/lib/api";
 
 export function AdminPanel() {
   const [data, setData] = useState<{ users: number; domains: number; twins: number; plugins: number; flags: Record<string, boolean> } | null>(null);
+  const [connectors, setConnectors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     api.admin().then(setData).catch(() => setData(null));
+    api.remaining().then((res) => setConnectors(res.connectors)).catch(() => setConnectors({}));
   }, []);
 
   return (
@@ -25,6 +27,15 @@ export function AdminPanel() {
           </dl>
           <ul className="mt-4 text-xs text-slate-300">
             {Object.entries(data.flags).map(([key, value]) => (
+              <li key={key} className="flex justify-between border-b border-white/5 py-1">
+                <span>{key}</span>
+                <span className={value ? "text-emerald-300" : "text-slate-500"}>{String(value)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-slate-500">Remaining connectors</p>
+          <ul className="mt-1 text-xs text-slate-300">
+            {Object.entries(connectors).map(([key, value]) => (
               <li key={key} className="flex justify-between border-b border-white/5 py-1">
                 <span>{key}</span>
                 <span className={value ? "text-emerald-300" : "text-slate-500"}>{String(value)}</span>

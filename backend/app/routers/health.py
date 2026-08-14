@@ -25,3 +25,11 @@ def health(db: Session = Depends(get_db)) -> dict:
         "domains": domains,
         "database": "ok" if db_ok else "error",
     }
+
+
+@router.get("/platform/remaining")
+def remaining() -> dict:
+    from app.services.connectors import connector_status
+
+    connectors = connector_status()
+    return {"status": "ok" if connectors["ready"] else "starting", "connectors": connectors}

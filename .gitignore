@@ -35,5 +35,7 @@ frontend/public/cesium/
 # Data
 *.sqlite
 *.db
+celerybeat-schedule
+celerybeat-schedule.*
 uploads/
 .tmp/

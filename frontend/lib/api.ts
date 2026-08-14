@@ -129,4 +129,7 @@ export const api = {
   path: (slug: string) => request<{ steps: { id: string; title: string; est_min: number }[]; adaptive_rule: string }>(`/ai/path?slug=${slug}`),
   cypher: () => request<{ statements: string[] }>("/graph/export/cypher"),
   locales: () => request<{ code: string; name: string }[]>("/ai/locales"),
+  remaining: () => request<{ status: string; connectors: Record<string, boolean> }>("/platform/remaining"),
+  ingestCityjsonSample: () =>
+    request<{ created: boolean; slug: string; objects: number }>("/twins/ingest/cityjson/sample", { method: "POST" }),
 };
