@@ -1,10 +1,6 @@
-"""STAC-shaped catalog so clients can switch to live Copernicus later."""
+from fastapi import APIRouter, Query
 
-from datetime import datetime, timezone
-
-from fastapi import APIRouter
-
-from app.services.gis import synthetic_ndvi
+from app.services.stac_live import search_with_fallback
 
 router = APIRouter(prefix="/stac", tags=["stac"])
 
@@ -15,38 +11,18 @@ def root() -> dict:
         "type": "Catalog",
         "id": "geotwinverse-stac",
         "stac_version": "1.0.0",
-        "description": "Proxy STAC catalog. Replace with Copernicus STAC when credentials exist.",
-        "links": [{"rel": "search", "href": "/api/v1/stac/search", "type": "application/geo+json"}],
+        "description": "Live Sentinel-2 search via Element84 Earth Search, with local fallback.",
+        "links": [
+            {"rel": "search", "href": "/api/v1/stac/search", "type": "application/geo+json"},
+            {"rel": "external", "href": "https://earth-search.aws.element84.com/v1", "type": "application/json"},
+        ],
     }
 
 
 @router.get("/search")
-def search(bbox: str = "-124,48,-123,49", datetime_range: str = "2024-01-01/2025-12-31") -> dict:
-    ndvi = synthetic_ndvi(seed=42)
-    now = datetime.now(timezone.utc).isoformat()
-    return {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "stac_version": "1.0.0",
-                "id": "S2A_proxy_canopy",
-                "collection": "sentinel-2-l2a",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [[[-123.5, 48.3], [-123.2, 48.3], [-123.2, 48.55], [-123.5, 48.55], [-123.5, 48.3]]],
-                },
-                "properties": {
-                    "datetime": now,
-                    "platform": "sentinel-2a",
-                    "eo:cloud_cover": 8.2,
-                    "geotwin:ndvi_mean": ndvi["ndvi_mean"],
-                    "bbox": bbox,
-                    "datetime_range": datetime_range,
-                },
-                "assets": {
-                    "ndvi": {"href": "/api/v1/satellite/indices?scene=canopy-reserve", "type": "application/json"},
-                },
-            }
-        ],
-    }
+def search(
+    bbox: str = Query("-123.6,48.3,-123.2,48.6"),
+    datetime_range: str = Query("2024-06-01/2024-08-31"),
+    limit: int = Query(5, le=20),
+) -> dict:
+    return search_with_fallback(bbox, datetime_range, limit=limit)

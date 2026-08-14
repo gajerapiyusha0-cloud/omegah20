@@ -16,6 +16,7 @@ export function SatellitePanel() {
   const [scene, setScene] = useState(SCENES[0]);
   const [data, setData] = useState<SceneResult | null>(null);
   const [error, setError] = useState("");
+  const [stac, setStac] = useState<{ live?: boolean; source?: string; features: { id: string; properties: Record<string, unknown> }[] } | null>(null);
 
   useEffect(() => {
     setError("");
@@ -23,13 +24,20 @@ export function SatellitePanel() {
       .satellite(scene)
       .then(setData)
       .catch(() => setError("Satellite proxy unavailable. Start the API on port 8000."));
+    api.stacSearch().then(setStac).catch(() => setStac(null));
   }, [scene]);
 
   return (
     <section className="pointer-events-auto absolute left-6 top-28 z-20 w-[34rem] max-w-[calc(100vw-3rem)] holo-panel rounded-3xl p-5 lg:left-[20rem]">
-      <p className="text-[10px] uppercase tracking-[0.35em] text-emerald-300">Copernicus proxy</p>
+      <p className="text-[10px] uppercase tracking-[0.35em] text-emerald-300">
+        {stac?.live ? "Live Sentinel-2 STAC" : "Copernicus proxy"}
+      </p>
       <h2 className="font-display mt-1 text-2xl">Satellite intelligence</h2>
-      <p className="mt-2 text-sm text-slate-400">Synthetic Sentinel-2 NDVI / NDWI until live credentials are configured.</p>
+      <p className="mt-2 text-sm text-slate-400">
+        {stac?.live
+          ? `Earth Search ${stac.source || ""} · ${stac.features.length} scenes`
+          : "Synthetic Sentinel-2 NDVI / NDWI with live STAC fallback."}
+      </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {SCENES.map((item) => (
           <button
@@ -41,6 +49,13 @@ export function SatellitePanel() {
           </button>
         ))}
       </div>
+      {stac?.features?.length ? (
+        <ul className="mt-3 max-h-24 space-y-1 overflow-auto text-[11px] text-slate-400">
+          {stac.features.slice(0, 4).map((item) => (
+            <li key={item.id}>{item.id}</li>
+          ))}
+        </ul>
+      ) : null}
       {error && <p className="mt-3 text-sm text-rose-300">{error}</p>}
       {data && (
         <>

@@ -103,3 +103,13 @@ def export_cypher(db: Session = Depends(get_db), limit: int = 40) -> dict:
     for edge in edges:
         statements.append(f"CREATE (n{edge.source_id})-[:{edge.relation.upper()}]->(n{edge.target_id})")
     return {"dialect": "cypher", "statements": statements, "note": "Offline Neo4j dual-write payload."}
+
+
+@router.post("/sync")
+def sync_graph(db: Session = Depends(get_db), limit: int = 40) -> dict:
+    from app.services.neo4j_bridge import sync_statements
+
+    payload = export_cypher(db, limit=limit)
+    result = sync_statements(payload["statements"])
+    result["dialect"] = "cypher"
+    return result

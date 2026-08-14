@@ -29,10 +29,14 @@ async def collab_socket(websocket: WebSocket, room_id: str) -> None:
     try:
         while True:
             message = await websocket.receive_json()
-            envelope = {"type": "message", "room": room_id, "payload": message}
+            kind = message.get("type", "chat")
+            envelope = {"type": kind if kind in {"offer", "answer", "ice", "chat"} else "message", "room": room_id, "payload": message}
             CHAT[room_id].append(envelope)
             living = []
             for peer in ROOMS[room_id]:
+                if kind in {"offer", "answer", "ice"} and peer is websocket:
+                    living.append(peer)
+                    continue
                 try:
                     await peer.send_json(envelope)
                     living.append(peer)

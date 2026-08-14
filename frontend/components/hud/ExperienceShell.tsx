@@ -30,6 +30,7 @@ import { SettingsPanel } from "./SettingsPanel";
 import { HelpOverlay } from "./HelpOverlay";
 import { JournalPanel } from "./JournalPanel";
 import { AssetLibrary } from "./AssetLibrary";
+import { VRButton } from "../universe/VRButton";
 import { useGamepadNav } from "@/lib/gamepad";
 
 const UniverseCanvas = dynamic(() => import("../universe/UniverseCanvas").then((m) => m.UniverseCanvas), { ssr: false });
@@ -120,6 +121,7 @@ export function ExperienceShell() {
       {mode === "gis" && <GisTools />}
       <HelpOverlay />
       <CommandPalette />
+      <VRButton />
       {!booted && <BootSplash />}
     </main>
   );

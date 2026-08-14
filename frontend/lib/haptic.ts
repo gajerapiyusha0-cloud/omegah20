@@ -1,4 +1,19 @@
-export type HapticChannel = "vibration" | "gamepad" | "noop";
+export type HapticChannel = "vibration" | "gamepad" | "webxr" | "noop";
+
+function xrPulse(duration: number, intensity: number) {
+  const session = (globalThis as { __geotwinXrSession?: XRSession }).__geotwinXrSession;
+  if (!session) return false;
+  let used = false;
+  for (const source of session.inputSources) {
+    const actuator = (source.gamepad as Gamepad & { hapticActuators?: { pulse: (i: number, d: number) => Promise<boolean> }[] } | null)
+      ?.hapticActuators?.[0];
+    if (actuator?.pulse) {
+      void actuator.pulse(intensity, duration);
+      used = true;
+    }
+  }
+  return used;
+}
 
 function vibrate(ms: number, intensity: number) {
   if (typeof navigator === "undefined" || !navigator.vibrate) return false;
@@ -28,6 +43,7 @@ export function playHaptic(pattern: { intensity?: number; duration_ms?: number; 
   if (!pattern) return { channel: "noop" as HapticChannel };
   const intensity = pattern.intensity ?? 0.4;
   const duration = pattern.duration_ms && pattern.duration_ms > 0 ? pattern.duration_ms : 80;
+  if (xrPulse(duration, intensity)) return { channel: "webxr" as HapticChannel };
   if (rumble(duration, intensity)) return { channel: "gamepad" as HapticChannel };
   if (vibrate(duration, intensity)) return { channel: "vibration" as HapticChannel };
   return { channel: "noop" as HapticChannel };

@@ -31,6 +31,15 @@ export function AdminPanel() {
               </li>
             ))}
           </ul>
+          <button
+            className="mt-3 rounded-full border border-white/10 px-3 py-1 text-[11px]"
+            onClick={async () => {
+              const res = await api.graphSync().catch(() => ({ backend: "offline", synced: 0 }));
+              setData((prev) => prev && { ...prev, flags: { ...prev.flags, neo4j: res.backend === "neo4j" } });
+            }}
+          >
+            Sync knowledge graph
+          </button>
         </>
       )}
     </section>

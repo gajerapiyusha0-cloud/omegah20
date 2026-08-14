@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
 from app.models import User
 from app.schemas import TokenResponse, UserCreate, UserPublic
@@ -44,6 +45,23 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     if not user or not verify_password(form.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return TokenResponse(access_token=create_access_token(user.email))
+
+
+@router.get("/oidc/start")
+def oidc_start() -> dict:
+    settings = get_settings()
+    if not settings.oidc_issuer or not settings.oidc_client_id:
+        return {
+            "configured": False,
+            "authorization_url": None,
+            "note": "Set OIDC_ISSUER and OIDC_CLIENT_ID to enable campus SSO.",
+        }
+    issuer = settings.oidc_issuer.rstrip("/")
+    url = (
+        f"{issuer}/authorize?response_type=code&client_id={settings.oidc_client_id}"
+        f"&redirect_uri={settings.oidc_redirect_uri}&scope=openid%20profile%20email"
+    )
+    return {"configured": True, "authorization_url": url}
 
 
 @router.get("/me", response_model=UserPublic)

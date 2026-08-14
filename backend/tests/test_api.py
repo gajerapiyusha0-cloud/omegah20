@@ -174,3 +174,11 @@ def test_remaining_platform_modules(client: TestClient):
     metrics = client.get("/metrics")
     assert metrics.status_code == 200
     assert "geotwin_up" in metrics.text
+    oidc = client.get("/api/v1/auth/oidc/start")
+    assert oidc.status_code == 200
+    assert oidc.json()["configured"] is False
+    synced = client.post("/api/v1/graph/sync")
+    assert synced.status_code == 200
+    assert synced.json()["backend"] in {"memory", "neo4j"}
+    stac = client.get("/api/v1/stac/search")
+    assert "features" in stac.json()

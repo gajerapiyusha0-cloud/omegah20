@@ -12,7 +12,7 @@ This repository implements the GeoTwinVerse Omega blueprint as a working researc
 - **Knowledge layer** — 360 unique domains with lessons, categories, and a seeded graph (`has_lab`, `related_to`, `cross_disciplinary`).
 - **Digital twins** — City, campus, factory, forest, transport, energy, environment, laboratory, agriculture, and lunar outpost twins with state ticks and assumptions.
 - **Simulations** — Flood, climate, traffic, SIR epidemic, NDVI phenology, Keplerian orbit.
-- **Satellite proxy** — Synthetic Sentinel-2 NDVI/NDWI grids until Copernicus credentials are configured.
+- **Satellite intelligence** — Live Sentinel-2 STAC via Element84 Earth Search, with synthetic NDVI fallback.
 - **AI core** — Deterministic semantic router for search, tutoring, geospatial, simulation, code, and haptic intents. Optional LLM key can be added later without API changes.
 - **Haptics** — 50 named patterns with Vibration API / gamepad rumble / no-op fallback. The product is fully usable without hardware.
 - **Education** — checkpoint quizzes, learning progress, historical timeline.
@@ -21,7 +21,8 @@ This repository implements the GeoTwinVerse Omega blueprint as a working researc
 - **GIS editing** — GeoJSON create, buffer, measure, heatmap, land-cover and disaster-assessment proxies.
 - **Journal, assets, settings** — field notes, asset library, locale / reduced-motion.
 - **Command palette** — Ctrl/⌘ K.
-- **Processing & STAC** — zonal/histogram proxies, GeoJSON export, STAC-shaped catalog.
+- **Processing & STAC** — zonal/histogram proxies, live Earth Search, GeoJSON export.
+- **Connectors** — Neo4j graph sync, OIDC SSO start, WebXR entry, WebRTC signaling on collab sockets.
 - **Observability** — Prometheus `/metrics`, plugin SDK, Cypher graph export, AI codegen + adaptive paths.
 
 ## Quick start
