@@ -16,3 +16,15 @@ def test_haversine_zero():
 def test_epidemic_peak_positive():
     result = run_simulation("epidemic", {"r0": 2.4, "days": 40, "population": 5000})
     assert result["peak_infected"] > 10
+
+
+def test_oidc_dev_discovery():
+    from fastapi.testclient import TestClient
+
+    from app.oidc_dev import app
+
+    client = TestClient(app)
+    health = client.get("/health")
+    assert health.json()["client_id"] == "geotwinverse-dev"
+    conf = client.get("/.well-known/openid-configuration")
+    assert "authorization_endpoint" in conf.json()

@@ -11,6 +11,7 @@ export function GisTools() {
   const [result, setResult] = useState("");
   const [heat, setHeat] = useState<{ name: string; weight: number }[]>([]);
   const [stac, setStac] = useState("");
+  const [job, setJob] = useState("");
 
   useEffect(() => {
     api.heatmap().then((res) => setHeat(res.points.map((p) => ({ name: p.name, weight: p.weight })))).catch(() => setHeat([]));
@@ -57,6 +58,19 @@ export function GisTools() {
         }}
       >
         STAC search {stac && `· ${stac}`}
+      </button>
+      <button
+        className="mt-2 rounded-full border border-white/10 px-3 py-1 text-[11px]"
+        onClick={async () => {
+          const queued = await api.ndviJob("canopy-reserve").catch(() => ({ queued: false, task_id: null, broker: "offline" }));
+          setJob(`${queued.broker}${queued.task_id ? ` · ${queued.task_id.slice(0, 8)}` : ""}`);
+          if (queued.task_id) {
+            const status = await api.jobStatus(queued.task_id).catch(() => null);
+            if (status?.result?.ndvi_mean != null) setJob(`${queued.broker} · NDVI ${status.result.ndvi_mean.toFixed(3)}`);
+          }
+        }}
+      >
+        Queue NDVI job {job && `· ${job}`}
       </button>
     </section>
   );

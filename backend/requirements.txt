@@ -9,6 +9,8 @@ python-jose[cryptography]==3.3.0
 python-multipart==0.0.20
 redis==5.2.1
 celery==5.4.0
+neo4j==5.27.0
+flower==2.0.1
 shapely==2.0.6
 pyproj==3.7.0
 numpy==2.2.1

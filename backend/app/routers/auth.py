@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from urllib.parse import quote
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -59,9 +61,53 @@ def oidc_start() -> dict:
     issuer = settings.oidc_issuer.rstrip("/")
     url = (
         f"{issuer}/authorize?response_type=code&client_id={settings.oidc_client_id}"
-        f"&redirect_uri={settings.oidc_redirect_uri}&scope=openid%20profile%20email"
+        f"&redirect_uri={quote(settings.oidc_redirect_uri, safe='')}&scope=openid%20profile%20email"
     )
     return {"configured": True, "authorization_url": url}
+
+
+@router.get("/oidc/callback", response_model=TokenResponse)
+def oidc_callback(code: str = Query(...), db: Session = Depends(get_db)) -> TokenResponse:
+    settings = get_settings()
+    if not settings.oidc_issuer or not settings.oidc_client_id:
+        raise HTTPException(status_code=400, detail="OIDC is not configured")
+    import httpx
+
+    token_url = f"{settings.oidc_issuer.rstrip('/')}/token"
+    try:
+        response = httpx.post(
+            token_url,
+            data={
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": settings.oidc_redirect_uri,
+                "client_id": settings.oidc_client_id,
+            },
+            timeout=8.0,
+        )
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        raise HTTPException(status_code=401, detail=f"OIDC token exchange failed: {exc}") from exc
+    id_token = payload.get("id_token") or payload.get("access_token")
+    if not id_token:
+        raise HTTPException(status_code=401, detail="OIDC response missing token")
+    claims = decode_token_unverified(id_token)
+    email = str(claims.get("email") or claims.get("sub") or "")
+    if not email:
+        raise HTTPException(status_code=401, detail="OIDC token missing email")
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = User(email=email, hashed_password=hash_password(f"oidc:{email}"), display_name=str(claims.get("name") or "SSO Explorer"))
+        db.add(user)
+        db.commit()
+    return TokenResponse(access_token=create_access_token(user.email))
+
+
+def decode_token_unverified(token: str) -> dict:
+    from jose import jwt
+
+    return jwt.get_unverified_claims(token)
 
 
 @router.get("/me", response_model=UserPublic)

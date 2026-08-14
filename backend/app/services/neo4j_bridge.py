@@ -22,11 +22,15 @@ def sync_statements(statements: list[str]) -> dict:
         from neo4j import GraphDatabase  # type: ignore
 
         driver = GraphDatabase.driver(uri, auth=(settings.neo4j_user, settings.neo4j_password))
-        with driver.session() as session:
+
+        def write_all(tx) -> None:
             for stmt in statements:
-                session.run(stmt)
+                tx.run(stmt)
+
+        with driver.session() as session:
+            session.execute_write(write_all)
         driver.close()
-        return {"synced": len(statements), "backend": "neo4j", "uri": uri}
+        return {"synced": len(statements), "backend": "neo4j", "uri": uri, "total": len(_MIRROR)}
     except Exception as exc:
         return {"synced": 0, "backend": "memory", "error": str(exc)[:200], "total": len(_MIRROR)}
 

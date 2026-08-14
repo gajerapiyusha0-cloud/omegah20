@@ -180,6 +180,8 @@ def test_remaining_platform_modules(client: TestClient):
     oidc = client.get("/api/v1/auth/oidc/start")
     assert oidc.status_code == 200
     assert oidc.json()["configured"] is False
+    missing = client.get("/api/v1/auth/oidc/callback", params={"code": "nope"})
+    assert missing.status_code == 400
     synced = client.post("/api/v1/graph/sync")
     assert synced.status_code == 200
     assert synced.json()["backend"] in {"memory", "neo4j"}

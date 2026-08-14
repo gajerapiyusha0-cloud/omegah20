@@ -10,6 +10,7 @@ export function GraphPanel() {
   const selectDomain = useExperience((s) => s.selectDomain);
   const [results, setResults] = useState<Domain[]>([]);
   const [graph, setGraph] = useState<{ nodes: { id: number; title: string }[]; edges: { source_id: number; target_id: number }[] } | null>(null);
+  const [syncNote, setSyncNote] = useState("");
 
   const local = useMemo(() => {
     const q = (query || "geospatial intelligence").toLowerCase();
@@ -38,6 +39,15 @@ export function GraphPanel() {
     <section className="pointer-events-auto absolute left-6 top-28 z-20 w-[30rem] max-w-[calc(100vw-3rem)] holo-panel rounded-3xl p-5 lg:left-[20rem]">
       <h2 className="font-display text-2xl">Knowledge graph</h2>
       <p className="mt-1 text-sm text-slate-400">Semantic neighborhood for “{query || "geospatial intelligence"}”.</p>
+      <button
+        className="mt-3 rounded-full border border-white/10 px-3 py-1 text-[11px]"
+        onClick={async () => {
+          const res = await api.graphSync().catch(() => ({ backend: "offline", synced: 0 }));
+          setSyncNote(`${res.backend} · ${res.synced} statements`);
+        }}
+      >
+        Sync to Neo4j {syncNote && `· ${syncNote}`}
+      </button>
       {graph && (
         <svg viewBox="0 0 320 120" className="mt-3 h-28 w-full" aria-hidden>
           {graph.edges.slice(0, 12).map((edge, i) => (

@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     neo4j_password: str = ""
     oidc_issuer: str = ""
     oidc_client_id: str = ""
-    oidc_redirect_uri: str = "http://localhost:3000"
+    oidc_redirect_uri: str = "http://localhost:3000/oidc/callback"
 
     @property
     def origins(self) -> list[str]:

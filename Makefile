@@ -1,4 +1,4 @@
-.PHONY: install backend-test frontend-test test dev-backend dev-frontend dev remaining
+.PHONY: install backend-test frontend-test test dev-backend dev-frontend dev remaining oidc
 
 install:
 	python3 -m pip install -r backend/requirements.txt
@@ -24,3 +24,6 @@ dev:
 
 remaining:
 	bash scripts/start-remaining.sh
+
+oidc:
+	bash scripts/start-oidc.sh

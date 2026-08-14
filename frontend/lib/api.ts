@@ -111,8 +111,10 @@ export const api = {
   landcover: (scene: string) => request<{ counts: Record<string, number>; classification: string }>(`/satellite/landcover?scene=${scene}`),
   disaster: (hazard = "flood") => request<{ advisory: string; recommended_twins: string[]; haptic: string }>(`/satellite/disaster?hazard=${hazard}`),
   stacSearch: () => request<{ live?: boolean; source?: string; features: { id: string; properties: Record<string, unknown> }[] }>("/stac/search"),
-  graphSync: () => request<{ backend: string; synced: number }>("/graph/sync", { method: "POST" }),
+  graphSync: () => request<{ backend: string; synced: number; note?: string }>("/graph/sync", { method: "POST" }),
   oidcStart: () => request<{ configured: boolean; authorization_url: string | null; note?: string }>("/auth/oidc/start"),
+  jobStatus: (taskId: string) =>
+    request<{ task_id: string; state: string; ready: boolean; result?: { ndvi_mean?: number } }>(`/processing/jobs/${taskId}`),
   assets: () => request<{ id: string; kind: string; name: string; format: string }[]>("/assets"),
   journal: () => request<{ id: number; title: string; body: string; domain_slug?: string }[]>("/journal"),
   addNote: (title: string, body: string, domain_slug?: string) =>
