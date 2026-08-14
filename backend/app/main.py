@@ -5,7 +5,27 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import SessionLocal, init_db
-from app.routers import ai, auth, bootstrap, domains, gis, graph, haptics, health, satellite, simulations, twins, ws
+from app.routers import (
+    admin,
+    ai,
+    analytics,
+    auth,
+    bootstrap,
+    collab,
+    domains,
+    education,
+    gis,
+    graph,
+    haptics,
+    health,
+    notifications,
+    plugins,
+    satellite,
+    simulations,
+    timeline,
+    twins,
+    ws,
+)
 from app.seed import seed_if_empty
 
 settings = get_settings()
@@ -51,4 +71,11 @@ app.include_router(simulations.router, prefix=prefix)
 app.include_router(satellite.router, prefix=prefix)
 app.include_router(ai.router, prefix=prefix)
 app.include_router(haptics.router, prefix=prefix)
+app.include_router(education.router, prefix=prefix)
+app.include_router(analytics.router, prefix=prefix)
+app.include_router(plugins.router, prefix=prefix)
+app.include_router(admin.router, prefix=prefix)
+app.include_router(notifications.router, prefix=prefix)
+app.include_router(timeline.router, prefix=prefix)
+app.include_router(collab.router, prefix=prefix)
 app.include_router(ws.router, prefix=prefix)

@@ -115,3 +115,42 @@ def test_auth_register_login(client: TestClient):
     me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert me.status_code == 200
     assert me.json()["email"] == email
+
+
+def test_quiz_hides_answers_and_grades(client: TestClient):
+    quiz = client.get("/api/v1/learn/quiz/gis")
+    assert quiz.status_code == 200
+    questions = quiz.json()["questions"]
+    assert "answer" not in questions[0]
+    graded = client.post("/api/v1/learn/quiz/gis/grade", json={"answers": [0, 0, 0]})
+    assert graded.status_code == 200
+    assert graded.json()["score"] == 100
+
+
+def test_plugins_analytics_admin_timeline(client: TestClient):
+    plugins = client.get("/api/v1/plugins")
+    assert plugins.status_code == 200
+    assert len(plugins.json()) >= 8
+    overview = client.get("/api/v1/analytics/overview")
+    assert overview.json()["domains"] >= 300
+    admin = client.get("/api/v1/admin/console")
+    assert admin.json()["haptic_patterns"] == 50
+    timeline = client.get("/api/v1/timeline")
+    assert len(timeline.json()) >= 5
+    notes = client.get("/api/v1/notifications")
+    assert len(notes.json()) >= 3
+
+
+def test_gis_buffer_and_landcover(client: TestClient):
+    buf = client.post(
+        "/api/v1/gis/buffer",
+        json={"geometry": {"type": "Point", "coordinates": [0, 0]}, "meters": 1000},
+    )
+    assert buf.status_code == 200
+    assert buf.json()["geometry"]["type"] in {"Polygon", "MultiPolygon"}
+    cover = client.get("/api/v1/satellite/landcover", params={"scene": "canopy-reserve"})
+    assert cover.status_code == 200
+    assert "counts" in cover.json()
+    graph = client.get("/api/v1/graph/domain/gis")
+    assert graph.status_code == 200
+    assert len(graph.json()["nodes"]) >= 1

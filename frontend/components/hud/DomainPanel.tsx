@@ -11,6 +11,9 @@ export function DomainPanel() {
   const [summary, setSummary] = useState("");
   const [lessons, setLessons] = useState<string[]>([]);
   const [related, setRelated] = useState<{ slug: string; name: string }[]>([]);
+  const [quiz, setQuiz] = useState<{ prompt: string; choices: string[] }[]>([]);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {
     if (!domain) return;
@@ -40,6 +43,14 @@ export function DomainPanel() {
             .map((d) => ({ slug: d.slug, name: d.name })),
         );
       });
+    api
+      .quiz(domain.slug)
+      .then((res) => {
+        setQuiz(res.questions);
+        setAnswers(res.questions.map(() => -1));
+        setScore(null);
+      })
+      .catch(() => setQuiz([]));
   }, [domain, domains]);
 
   if (!domain) return null;
@@ -70,6 +81,37 @@ export function DomainPanel() {
               {item.name}
             </button>
           ))}
+        </div>
+      )}
+      {quiz.length > 0 && (
+        <div className="mt-4 space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-holos">Checkpoint quiz</p>
+          {quiz.map((question, qi) => (
+            <div key={question.prompt} className="rounded-xl border border-white/10 p-3">
+              <p className="text-xs">{question.prompt}</p>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {question.choices.map((choice, ci) => (
+                  <button
+                    key={choice}
+                    className={`rounded-full px-2 py-1 text-[10px] ${answers[qi] === ci ? "bg-cyan-400/20 text-holos" : "border border-white/10"}`}
+                    onClick={() => setAnswers((prev) => prev.map((v, i) => (i === qi ? ci : v)))}
+                  >
+                    {choice}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <button
+            className="rounded-xl bg-cyan-400/20 px-3 py-2 text-xs text-holos"
+            onClick={async () => {
+              if (!domain) return;
+              const res = await api.gradeQuiz(domain.slug, answers).catch(() => ({ score: 0 }));
+              setScore(res.score);
+            }}
+          >
+            Grade {score !== null ? `· ${score}%` : ""}
+          </button>
         </div>
       )}
       <button className="mt-4 text-xs uppercase tracking-widest text-slate-400" onClick={() => selectDomain(undefined)}>

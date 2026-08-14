@@ -10,6 +10,11 @@ const ITEMS: { mode: Mode; label: string }[] = [
   { mode: "sim", label: "Simulate" },
   { mode: "satellite", label: "Satellite" },
   { mode: "haptics", label: "Haptics" },
+  { mode: "timeline", label: "Timeline" },
+  { mode: "analytics", label: "Analytics" },
+  { mode: "plugins", label: "Plugins" },
+  { mode: "collab", label: "Collab" },
+  { mode: "admin", label: "Admin" },
   { mode: "learn", label: "Learn" },
 ];
 
@@ -20,8 +25,8 @@ export function RadialMenu() {
   const selectDomain = useExperience((s) => s.selectDomain);
 
   return (
-    <nav aria-label="Spatial modes" className="pointer-events-none absolute bottom-8 left-1/2 z-20 -translate-x-1/2">
-      <div className="pointer-events-auto flex flex-wrap justify-center gap-1 rounded-full holo-panel px-2 py-2">
+    <nav aria-label="Spatial modes" className="pointer-events-none absolute bottom-6 left-1/2 z-20 w-[min(96vw,72rem)] -translate-x-1/2">
+      <div className="pointer-events-auto flex flex-wrap justify-center gap-1 rounded-3xl holo-panel px-2 py-2">
         {ITEMS.map((item) => (
           <button
             key={item.mode}

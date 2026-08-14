@@ -9,6 +9,7 @@ export function GraphPanel() {
   const domains = useExperience((s) => s.domains);
   const selectDomain = useExperience((s) => s.selectDomain);
   const [results, setResults] = useState<Domain[]>([]);
+  const [graph, setGraph] = useState<{ nodes: { id: number; title: string }[]; edges: { source_id: number; target_id: number }[] } | null>(null);
 
   const local = useMemo(() => {
     const q = (query || "geospatial intelligence").toLowerCase();
@@ -27,10 +28,29 @@ export function GraphPanel() {
 
   const items = results.length ? results : local;
 
+  useEffect(() => {
+    const slug = items[0]?.slug || domains[0]?.slug;
+    if (!slug) return;
+    api.domainGraph(slug).then(setGraph).catch(() => setGraph(null));
+  }, [items, domains]);
+
   return (
     <section className="pointer-events-auto absolute left-6 top-28 z-20 w-[30rem] max-w-[calc(100vw-3rem)] holo-panel rounded-3xl p-5 lg:left-[20rem]">
       <h2 className="font-display text-2xl">Knowledge graph</h2>
       <p className="mt-1 text-sm text-slate-400">Semantic neighborhood for “{query || "geospatial intelligence"}”.</p>
+      {graph && (
+        <svg viewBox="0 0 320 120" className="mt-3 h-28 w-full" aria-hidden>
+          {graph.edges.slice(0, 12).map((edge, i) => (
+            <line key={`${edge.source_id}-${edge.target_id}-${i}`} x1={20 + (i % 8) * 36} y1="24" x2={40 + (i % 7) * 40} y2="88" stroke="#67e8f9" strokeOpacity="0.35" />
+          ))}
+          {graph.nodes.slice(0, 8).map((node, i) => (
+            <g key={node.id}>
+              <circle cx={28 + i * 36} cy={i % 2 === 0 ? 32 : 80} r="7" fill="#67e8f9" />
+              <title>{node.title}</title>
+            </g>
+          ))}
+        </svg>
+      )}
       <ul className="mt-4 space-y-2">
         {items.map((item) => (
           <li key={item.slug}>

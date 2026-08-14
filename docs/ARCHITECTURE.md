@@ -35,7 +35,13 @@ Platform: SQLAlchemy, optional PostGIS, Redis/Celery, Docker, Actions
 | `/api/v1/satellite` | NDVI/NDWI proxy |
 | `/api/v1/ai` | Assistant |
 | `/api/v1/haptics` | Pattern catalog and play |
-| `/api/v1/ws/universe` | Realtime echo channel |
+| `/api/v1/learn` | Quizzes and learning progress |
+| `/api/v1/analytics` | Platform metrics |
+| `/api/v1/plugins` | Marketplace catalog |
+| `/api/v1/admin` | Administration console |
+| `/api/v1/notifications` | Spatial alerts |
+| `/api/v1/collab` | Collaboration rooms + websocket |
+| `/api/v1/timeline` | Historical knowledge events |
 
 Geometry is stored as GeoJSON so the API runs on SQLite in CI and PostGIS in Docker. Shapely and pyproj perform analysis without requiring GDAL at runtime (GDAL remains in the Docker image for future raster jobs).
 

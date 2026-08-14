@@ -17,6 +17,14 @@ import { CatalogDrawer } from "./CatalogDrawer";
 import { SatellitePanel } from "./SatellitePanel";
 import { HapticLab } from "./HapticLab";
 import { BootSplash } from "./BootSplash";
+import { AnalyticsPanel } from "./AnalyticsPanel";
+import { PluginStore } from "./PluginStore";
+import { CollabPanel } from "./CollabPanel";
+import { AdminPanel } from "./AdminPanel";
+import { AuthPanel } from "./AuthPanel";
+import { TimelinePanel } from "./TimelinePanel";
+import { GisTools } from "./GisTools";
+import { NotificationBell } from "./NotificationBell";
 
 const UniverseCanvas = dynamic(() => import("../universe/UniverseCanvas").then((m) => m.UniverseCanvas), { ssr: false });
 const CesiumViewer = dynamic(() => import("../gis/CesiumViewer").then((m) => m.CesiumViewer), { ssr: false });
@@ -72,6 +80,7 @@ export function ExperienceShell() {
       <div className="absolute inset-0">{mode === "gis" ? <CesiumViewer /> : <UniverseCanvas />}</div>
       <div className="pointer-events-none absolute inset-0 scanlines" />
       <TopBar />
+      <NotificationBell />
       <CatalogDrawer />
       <RadialMenu />
       <AssistantDock />
@@ -82,6 +91,17 @@ export function ExperienceShell() {
       {mode === "graph" && <GraphPanel />}
       {mode === "satellite" && <SatellitePanel />}
       {mode === "haptics" && <HapticLab />}
+      {mode === "analytics" && <AnalyticsPanel />}
+      {mode === "plugins" && <PluginStore />}
+      {mode === "collab" && <CollabPanel />}
+      {mode === "admin" && (
+        <>
+          <AdminPanel />
+          <AuthPanel />
+        </>
+      )}
+      {mode === "timeline" && <TimelinePanel />}
+      {mode === "gis" && <GisTools />}
       {!booted && <BootSplash />}
     </main>
   );

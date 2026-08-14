@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geotwinverse-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geotwinverse-api
+  template:
+    metadata:
+      labels:
+        app: geotwinverse-api
+    spec:
+      containers:
+        - name: api
+          image: geotwinverse-api:0.1.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: sqlite:////data/geotwinverse.db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geotwinverse-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geotwinverse-web
+  template:
+    metadata:
+      labels:
+        app: geotwinverse-web
+    spec:
+      containers:
+        - name: web
+          image: geotwinverse-web:0.1.0
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geotwinverse-api
+spec:
+  selector:
+    app: geotwinverse-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geotwinverse-web
+spec:
+  selector:
+    app: geotwinverse-web
+  ports:
+    - port: 80
+      targetPort: 3000

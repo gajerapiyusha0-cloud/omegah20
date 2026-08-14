@@ -78,4 +78,36 @@ export const api = {
       haptics: { id: string; name: string; category: string; intensity: number; duration_ms: number }[];
       engines: { id: string; name: string; haptic: string }[];
     }>("/bootstrap"),
+  quiz: (slug: string) =>
+    request<{ title: string; questions: { id: string; prompt: string; choices: string[] }[] }>(`/learn/quiz/${slug}`),
+  gradeQuiz: (slug: string, answers: number[]) =>
+    request<{ score: number; correct: number; total: number }>(`/learn/quiz/${slug}/grade`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }),
+  analytics: () =>
+    request<{ domains: number; twins: number; features: number; simulations: number; explorers: number; categories: { name: string; count: number }[] }>(
+      "/analytics/overview",
+    ),
+  plugins: () => request<{ id: string; name: string; category: string; status: string; summary: string }[]>("/plugins"),
+  enablePlugin: (id: string) => request(`/plugins/${id}/enable`, { method: "POST" }),
+  admin: () => request<{ users: number; domains: number; twins: number; plugins: number; flags: Record<string, boolean> }>("/admin/console"),
+  notifications: () => request<{ id: string; kind: string; title: string; body: string; haptic: string }[]>("/notifications"),
+  collabRooms: () => request<{ id: string; name: string; occupants: number }[]>("/collab/rooms"),
+  timeline: () => request<{ year: number; title: string; domains: string[] }[]>("/timeline"),
+  domainGraph: (slug: string) =>
+    request<{ nodes: { id: number; title: string; kind: string }[]; edges: { source_id: number; target_id: number; relation: string }[] }>(
+      `/graph/domain/${slug}`,
+    ),
+  buffer: (geometry: Record<string, unknown>, meters: number) =>
+    request("/gis/buffer", { method: "POST", body: JSON.stringify({ geometry, meters }) }),
+  login: (email: string, password: string) => {
+    const body = new URLSearchParams({ username: email, password });
+    return fetch(`${API_URL}/auth/login`, { method: "POST", body }).then((res) => {
+      if (!res.ok) throw new Error("login failed");
+      return res.json() as Promise<{ access_token: string }>;
+    });
+  },
+  landcover: (scene: string) => request<{ counts: Record<string, number>; classification: string }>(`/satellite/landcover?scene=${scene}`),
+  disaster: (hazard = "flood") => request<{ advisory: string; recommended_twins: string[]; haptic: string }>(`/satellite/disaster?hazard=${hazard}`),
 };

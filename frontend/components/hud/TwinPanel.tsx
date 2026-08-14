@@ -9,8 +9,20 @@ export function TwinPanel() {
   const selected = useExperience((s) => s.selectedTwin);
   const selectTwin = useExperience((s) => s.selectTwin);
   const [live, setLive] = useState<Twin | undefined>(selected);
+  const [series, setSeries] = useState<number[]>([]);
 
-  useEffect(() => setLive(selected ?? twins[0]), [selected, twins]);
+  useEffect(() => {
+    setLive(selected ?? twins[0]);
+    const slug = selected?.slug ?? twins[0]?.slug;
+    if (!slug) return;
+    api
+      .twinSeries(slug)
+      .then((res) => {
+        const key = Object.keys(res.samples[0]?.metrics || {}).find((k) => typeof res.samples[0].metrics[k] === "number");
+        setSeries(res.samples.map((s) => Number(key ? s.metrics[key] : 0)));
+      })
+      .catch(() => setSeries([]));
+  }, [selected, twins]);
 
   if (!live) {
     return (
@@ -35,6 +47,17 @@ export function TwinPanel() {
         ))}
       </dl>
       <p className="mt-3 text-[11px] text-slate-500">Assumptions: {live.assumptions.join(" · ")}</p>
+      {series.length > 0 && (
+        <div className="mt-3 flex h-12 items-end gap-1">
+          {series.map((value, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-t bg-amber-300/70"
+              style={{ height: `${Math.min(100, Math.abs(value) * 8 + 10)}%` }}
+            />
+          ))}
+        </div>
+      )}
       <div className="mt-4 flex flex-wrap gap-2">
         {twins.map((twin) => (
           <button key={twin.slug} onClick={() => selectTwin(twin)} className="rounded-full border border-white/10 px-3 py-1 text-xs">

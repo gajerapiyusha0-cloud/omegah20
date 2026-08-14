@@ -51,6 +51,25 @@ def graph_neighborhood(node_id: int, depth: int = 1, db: Session = Depends(get_d
     }
 
 
+@router.get("/domain/{slug}")
+def domain_graph(slug: str, db: Session = Depends(get_db)) -> dict:
+    from app.models import KnowledgeDomain
+
+    domain = db.query(KnowledgeDomain).filter(KnowledgeDomain.slug == slug).first()
+    if not domain:
+        raise HTTPException(status_code=404, detail="Domain not found")
+    nodes = db.query(GraphNode).filter(GraphNode.domain_id == domain.id).all()
+    ids = [n.id for n in nodes]
+    edges = db.query(GraphEdge).filter((GraphEdge.source_id.in_(ids)) | (GraphEdge.target_id.in_(ids))).all()
+    extra_ids = {e.source_id for e in edges} | {e.target_id for e in edges}
+    extra_nodes = db.query(GraphNode).filter(GraphNode.id.in_(extra_ids)).all() if extra_ids else nodes
+    return {
+        "domain": domain.slug,
+        "nodes": [GraphNodePublic.model_validate(n).model_dump() for n in extra_nodes],
+        "edges": [GraphEdgePublic.model_validate(e).model_dump() for e in edges],
+    }
+
+
 @router.get("/constellation")
 def constellation(db: Session = Depends(get_db), category: str | None = None) -> dict:
     from app.models import KnowledgeDomain

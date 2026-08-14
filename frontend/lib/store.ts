@@ -1,7 +1,20 @@
 import { create } from "zustand";
 import type { Domain, Twin } from "./api";
 
-export type Mode = "universe" | "gis" | "graph" | "twin" | "sim" | "learn" | "satellite" | "haptics";
+export type Mode =
+  | "universe"
+  | "gis"
+  | "graph"
+  | "twin"
+  | "sim"
+  | "learn"
+  | "satellite"
+  | "haptics"
+  | "analytics"
+  | "plugins"
+  | "collab"
+  | "admin"
+  | "timeline";
 
 type ExperienceState = {
   mode: Mode;
